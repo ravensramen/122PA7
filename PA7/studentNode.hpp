@@ -1,27 +1,47 @@
-#include "studentData.hpp"
+#ifndef STUDENTNODE_HPP
+#define STUDENTNODE_HPP
 
-//uses template type, node for each student
+//note for future self: i kept getting constructor errors with the list, after a couple
+//hours i discovered template definitions must be in header :')
 
 template <typename T>
-
 class studentNode {
 private:
-	T data; //template for data stored, will be of "Data" class type from studentData.hpp
-	studentNode<T>* pNext; //pointer to next node, contains data "T"
+    T data;
+    studentNode<T>* pNext;
 
 public:
-	//default constructor and destructor
-	studentNode();
-	~studentNode();
+    // Default constructor
+    studentNode() : pNext(nullptr) {}
 
-	//copy constructor, this function must be declared in header (idk why, doesn't work otherwise)
-	studentNode(const studentNode &rhs);
+    // Constructor with data
+    studentNode(T newData) : data(newData), pNext(nullptr) {}
 
+    // Copy constructor
+    studentNode(const studentNode& rhs) {
+        this->setNodeData(rhs.data);
+        this->setNext(rhs.pNext);
+    }
 
-	//setters and getters
-	void setNodeData(T newData);
-	T getNodeData(void);
+    // Getter for data
+    T& getNodeData() {
+        return data;
+    }
 
-	void setNext(studentNode<T>* newNext);
-	studentNode<T>* getNext(void);
+    // Setter for data
+    void setNodeData(T newData) {
+        data = newData;
+    }
+
+    // Getter for next pointer (const version)
+    studentNode<T>* getNext() const {
+        return pNext;
+    }
+
+    // Setter for next pointer
+    void setNext(studentNode<T>* newNext) {
+        pNext = newNext;
+    }
 };
+
+#endif // STUDENTNODE_HPP

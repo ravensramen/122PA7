@@ -22,7 +22,15 @@ private:
 public:
 
 	//no special definition needed, stacks of STL type handle memory alloc.
-	Data() {};
+	Data() {
+		recordNumber = 0;
+		idNumber = 0;
+		name = "";
+		email = "";
+		credits = -1;
+		major = "";
+		level = "";
+	};
 	~Data() {};
 
 	//setters and getters for each field...

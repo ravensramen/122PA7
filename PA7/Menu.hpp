@@ -1,8 +1,9 @@
-#include "AttendanceTracker.hpp"
+#ifndef MENU_HPP
+#define MENU_HPP
 
-//add insert at end in List.hpp/cpp
-//test/overview constructors and destructors
-//copy constructor and overloaded copy assignment
+#include "AttendanceTracker.hpp"
+#include "List.cpp"
+#include "studentData.hpp"
 
 class App {
 public:
@@ -13,8 +14,8 @@ public:
 
 	void runApp(); //public version of run
 private:
-
-	
-	
+	void lineToList(List<Data>& Masterlist, string line); //take each line and add to master list
 
 };
+
+#endif

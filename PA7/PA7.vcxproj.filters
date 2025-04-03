@@ -24,9 +24,6 @@
     <ClCompile Include="List.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="studentNode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AttendanceTracker.hpp">
@@ -49,7 +46,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\classlist.csv">
+    <None Include="classlist.csv">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
