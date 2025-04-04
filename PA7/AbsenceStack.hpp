@@ -10,9 +10,11 @@ template<class T, class Container = std::deque<T>>
 class absenceStack {
 
 public:
-	//includes push, pop, peek, etc.
-	//explicit definition not neccessary, included in std stack
+
+	void pushAbsence(const string& date) {
+		container.push(date); // using push of the underlying container (std::stack)
+	}
+
 private:
 	Container container; //to access private functions
-
 };

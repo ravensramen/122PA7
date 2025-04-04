@@ -131,10 +131,127 @@ void App::loadMaster(ifstream& masterFile, List<Data> &studentList) {
 		istringstream buffer(line);
 
 		if (!line.empty() && line2 != line) {
-			parseString(buffer, temp, false); //need to make a generic function for parsing :( (or copy) >:)
+			parseData(buffer, temp, false); //need to make a generic function for parsing :( (or copy) >:)
 			studentList.insertAtEnd(temp);
 		}
 		line2 = line;
+	}
+
+}
+
+void App::parseData(istringstream& inputString, Data& output, bool input)
+{
+	string token = "Null";
+	string tempString; //for naming
+
+	short record = 0;
+	int id_nums = 0;
+
+	//Time for adding absences
+
+	struct tm cur;
+	struct tm prev;
+	prev = { 0,0,0,1,0,0,110,0,0 };
+
+	char tempTime[1024] = { 0 };
+
+	bool absent; //bool to denote absent or not
+
+	if (input == true) { //for inputting from original csv
+		for (int type = 1; inputString; type++) {
+			getline(inputString, token, ',');
+			switch (type) {
+			case 1:
+				std::stringstream(token) >> record;
+				output.setRecordNumber(record);
+				break;
+
+			case 2:
+				std::stringstream(token) >> id_nums;
+				output.setIdNumber(id_nums);
+				break;
+
+			case 3:
+				tempString = token;
+				getline(inputString, token, ',');
+				tempString = tempString + ',' + token;
+				output.setName(tempString);
+				break;
+
+			case 4:
+				output.setEmail(token);
+				break;
+
+			case 5:
+				if (token == "AU") {
+					int num = -1;
+					output.setCredits(num);
+				}
+				else {
+					output.setCredits(stoi(token));
+				}
+				break;
+			case 6:
+				output.setMajor(token);
+				break;
+			case 7:
+				output.setMajor(token);
+				break;
+			}
+		}
+	}
+	else {
+		for (int type = 1; inputString; type++) {
+			getline(inputString, token, ',');
+			switch (type) {
+
+			case 1:
+				std::stringstream(token) >> record;
+				output.setRecordNumber(record);
+				break;
+
+			case 2:
+				std::stringstream(token) >> id_nums;
+				output.setIdNumber(id_nums);
+				break;
+
+			case 3:
+				tempString = token;
+				getline(inputString, token, ',');
+				tempString = tempString + ',' + token;
+				output.setName(tempString);
+				break;
+
+			case 4:
+				output.setEmail(token);
+				break;
+
+			case 5:
+				if (token == "AU") {
+					int num = -1;
+					output.setCredits(num);
+				}
+				else {
+					output.setCredits(stoi(token));
+				}
+				break;
+			case 6:
+				output.setMajor(token);
+				break;
+			case 7:
+				output.setMajor(token);
+				break;
+
+			default:
+
+
+				}
+
+			}
+
+
+
+		}
 	}
 
 }

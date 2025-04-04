@@ -17,10 +17,10 @@ private:
 	string major;
 	string level;
 
+	int numAbsences;
 	absenceStack <string> absences; //declare an instance of stack holding strings (coresponding to dates)
 
 public:
-
 	//no special definition needed, stacks of STL type handle memory alloc.
 	Data() {
 		recordNumber = 0;
@@ -30,15 +30,20 @@ public:
 		credits = 0;
 		major = "";
 		level = "";
+
+		numAbsences = 0;
 	};
 
 	Data(const Data& other) {
 		this->recordNumber = other.recordNumber;
+		this->idNumber = other.idNumber;
 		this->name = other.name;
 		this->email = other.email;
 		this->credits = other.credits;
 		this->major = other.major;
 		this->level = other.level;
+
+		this->numAbsences = other.numAbsences;
 	}
 
 
@@ -52,6 +57,8 @@ public:
 			this->credits = other.credits;
 			this->major = other.major;
 			this->level = other.level;
+
+			this->numAbsences = other.numAbsences;
 		}
 
 		return *this;
@@ -115,4 +122,14 @@ public:
 	string getLevel(void) {
 		return this->level;
 	}
+
+	int getNumAbsences(void) {
+		return this->numAbsences; //could also iterate through stack to determine...
+	}
+
+	void setAbsenceDate(string absence) { //like a push
+		this->absences.pushAbsence(absence); //insert absence date on top of stack
+		this->numAbsences++; //increment number of absences in stack
+	}
+	
 };
