@@ -24,8 +24,11 @@ public:
 	void runApp(); //public version of run
 private:
 	void lineToList(List<Data>& Masterlist, string line); //take each line and add to master list
+	
 	void loadMaster(ifstream& masterFile, List<Data>& studentList);
-	void parseData(istringstream &inputString, Data &output, bool input);
+	
+	void lineToListMaster(List<Data>& Masterlist, string line); //this version includes absence data
+
 };
 
 #endif

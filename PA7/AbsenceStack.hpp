@@ -11,10 +11,10 @@ class absenceStack {
 
 public:
 
-	void pushAbsence(const string& date) {
-		container.push(date); // using push of the underlying container (std::stack)
-	}
+    void pushAbsence(const string& date) {
+        container.push(date);  
+    }
 
 private:
-	Container container; //to access private functions
+    stack<string, Container> container;//to access private functions
 };

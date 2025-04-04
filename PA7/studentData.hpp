@@ -123,13 +123,27 @@ public:
 		return this->level;
 	}
 
+	void setNumAbsences(int num) {
+		this->numAbsences = num;
+	}
+
 	int getNumAbsences(void) {
 		return this->numAbsences; //could also iterate through stack to determine...
 	}
 
-	void setAbsenceDate(string absence) { //like a push
-		this->absences.pushAbsence(absence); //insert absence date on top of stack
-		this->numAbsences++; //increment number of absences in stack
+
+	void setAbsenceDate(string absence) {
+		this->absences.pushAbsence(absence);  // Insert absence date on top of stack
+	}
+
+	// Getter for absences stack
+	absenceStack<string> getAbsences(void) const {
+		return this->absences;  // Return the entire stack of absences
+	}
+
+	// Setter for the absences stack (this assumes the absenceStack type is available)
+	void setAbsences(const absenceStack<string>& absences) {
+		this->absences = absences;  // Set the stack to a new one
 	}
 	
 };

@@ -49,6 +49,10 @@ void App::runApp() {
 		}break;
 		case 2: {
 			//load list into linked list
+			if (!masterList.isEmpty()) { //insure list object of app is empty, or would write to end
+				masterList.destroyList();
+			}
+			loadMaster(masterData, masterList); //load data into updated list
 
 
 		}break;
@@ -119,139 +123,78 @@ void App::lineToList(List<Data> &masterList, string line) {
 }
 
 void App::loadMaster(ifstream& masterFile, List<Data> &studentList) {
-	string line, line2;
+	string line;  // Variable to hold each line of the file
 
-	if (!masterFile) {
-		cout << "Unable to read master file" << endl;
-		return;
-	}
-	while (masterFile) {
-		Data temp;
-		getline(masterFile, line);
-		istringstream buffer(line);
+	// Check if the file is open		
+	 if (masterFile.is_open()) {
+		cout << "master file opened successfully" << endl << endl; //for debuggin
 
-		if (!line.empty() && line2 != line) {
-			parseData(buffer, temp, false); //need to make a generic function for parsing :( (or copy) >:)
-			studentList.insertAtEnd(temp);
+	// Loop through the lines in the file
+		while (getline(masterFile, line)) {
+			lineToListMaster(studentList, line); //load pre-existing list (with absences)
 		}
-		line2 = line;
-	}
+		cout << "linked list updated to include absences" << endl;
 
+		}
+	else {
+		cout << "failed to open file" << endl;
+	}
 }
 
-void App::parseData(istringstream& inputString, Data& output, bool input)
-{
-	string token = "Null";
-	string tempString; //for naming
+void App::lineToListMaster(List<Data>& masterList, string line) {
+	// Similar to lineToList, adds absence number and stack components
 
-	short record = 0;
-	int id_nums = 0;
+	istringstream iss(line); // Store line as a stream for parsing
+	string inputVal; // Blank string to store line components
 
-	//Time for adding absences
+	Data student; // New Data object to store each line component
 
-	struct tm cur;
-	struct tm prev;
-	prev = { 0,0,0,1,0,0,110,0,0 };
+	// Parse record number
+	getline(iss, inputVal, ',');
+	student.setRecordNumber(stoi(inputVal));
 
-	char tempTime[1024] = { 0 };
+	// (There's a duplicate line setting the record number, so this one should be removed)
+	//getline(iss, inputVal, ',');
+	//student.setRecordNumber(stoi(inputVal));
 
-	bool absent; //bool to denote absent or not
+	string firstName, lastName;
+	getline(iss, firstName, ',');
+	getline(iss, lastName, ',');
 
-	if (input == true) { //for inputting from original csv
-		for (int type = 1; inputString; type++) {
-			getline(inputString, token, ',');
-			switch (type) {
-			case 1:
-				std::stringstream(token) >> record;
-				output.setRecordNumber(record);
-				break;
+	inputVal = firstName + ',' + lastName;
+	student.setName(inputVal); // Set full name
 
-			case 2:
-				std::stringstream(token) >> id_nums;
-				output.setIdNumber(id_nums);
-				break;
+	// Parse email
+	getline(iss, inputVal, ',');
+	student.setEmail(inputVal);
 
-			case 3:
-				tempString = token;
-				getline(inputString, token, ',');
-				tempString = tempString + ',' + token;
-				output.setName(tempString);
-				break;
-
-			case 4:
-				output.setEmail(token);
-				break;
-
-			case 5:
-				if (token == "AU") {
-					int num = -1;
-					output.setCredits(num);
-				}
-				else {
-					output.setCredits(stoi(token));
-				}
-				break;
-			case 6:
-				output.setMajor(token);
-				break;
-			case 7:
-				output.setMajor(token);
-				break;
-			}
-		}
+	// Parse credits, handle audit case
+	getline(iss, inputVal, ',');
+	if (inputVal == "AU") {
+		student.setCredits(-1); // Negative value denotes audit
 	}
 	else {
-		for (int type = 1; inputString; type++) {
-			getline(inputString, token, ',');
-			switch (type) {
-
-			case 1:
-				std::stringstream(token) >> record;
-				output.setRecordNumber(record);
-				break;
-
-			case 2:
-				std::stringstream(token) >> id_nums;
-				output.setIdNumber(id_nums);
-				break;
-
-			case 3:
-				tempString = token;
-				getline(inputString, token, ',');
-				tempString = tempString + ',' + token;
-				output.setName(tempString);
-				break;
-
-			case 4:
-				output.setEmail(token);
-				break;
-
-			case 5:
-				if (token == "AU") {
-					int num = -1;
-					output.setCredits(num);
-				}
-				else {
-					output.setCredits(stoi(token));
-				}
-				break;
-			case 6:
-				output.setMajor(token);
-				break;
-			case 7:
-				output.setMajor(token);
-				break;
-
-			default:
-
-
-				}
-
-			}
-
-
-
-		}
+		student.setCredits(stoi(inputVal)); // Otherwise, set regular credits
 	}
 
+	// Parse major
+	getline(iss, inputVal, ',');
+	student.setMajor(inputVal);
+
+	// Parse level
+	getline(iss, inputVal, ',');
+	student.setLevel(inputVal);
+
+	// Parse the number of absences
+	getline(iss, inputVal, ',');
+	student.setNumAbsences(stoi(inputVal)); // Set number of absences
+
+	// Add absence dates to the student's absence stack
+	for (int i = 0; i < student.getNumAbsences(); ++i) {
+		getline(iss, inputVal, ',');
+		student.setAbsenceDate(inputVal); // Push date onto student's stack
+	}
+
+	// Insert the student into the master list
+	masterList.insertAtEnd(student); // Insert updated student data into the linked list
 }
