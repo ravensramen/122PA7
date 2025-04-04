@@ -1,8 +1,13 @@
+//continue load,,, work on parsing
+
+
+
+
 #ifndef MENU_HPP
 #define MENU_HPP
 
 #include "AttendanceTracker.hpp"
-#include "List.cpp"
+#include "List.hpp"
 #include "studentData.hpp"
 
 class App {
@@ -15,7 +20,7 @@ public:
 	void runApp(); //public version of run
 private:
 	void lineToList(List<Data>& Masterlist, string line); //take each line and add to master list
-
+	void loadMaster(ifstream& masterFile, List<Data>& studentList);
 };
 
 #endif

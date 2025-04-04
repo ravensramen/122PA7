@@ -4,6 +4,10 @@
 //note for future self: i kept getting constructor errors with the list, after a couple
 //hours i discovered template definitions must be in header :')
 
+//constructor available across files
+//template <typename T>
+//studentNode<T>* newStudentNode(T newData) { return new studentNode<T>(newData); }
+
 template <typename T>
 class studentNode {
 private:

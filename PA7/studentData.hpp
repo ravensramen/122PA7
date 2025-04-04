@@ -27,10 +27,36 @@ public:
 		idNumber = 0;
 		name = "";
 		email = "";
-		credits = -1;
+		credits = 0;
 		major = "";
 		level = "";
 	};
+
+	Data(const Data& other) {
+		this->recordNumber = other.recordNumber;
+		this->name = other.name;
+		this->email = other.email;
+		this->credits = other.credits;
+		this->major = other.major;
+		this->level = other.level;
+	}
+
+
+
+	Data& operator=(const Data& other) { //copy overloaded assignment
+		if (this != &other) { 
+			
+			this->recordNumber = other.recordNumber;
+			this->name = other.name;
+			this->email = other.email;
+			this->credits = other.credits;
+			this->major = other.major;
+			this->level = other.level;
+		}
+
+		return *this;
+	}
+
 	~Data() {};
 
 	//setters and getters for each field...
