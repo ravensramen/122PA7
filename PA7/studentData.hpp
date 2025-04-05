@@ -14,10 +14,10 @@ private:
     string level;
 
     int numAbsences;
-    absenceStack<string> absences;  // Stack holding absences
+    absenceStack<string> absences;  // stack holding absences
 
 public:
-    // Default constructor
+    // default constructor
     Data() {
         recordNumber = 0;
         idNumber = 0;
@@ -29,7 +29,7 @@ public:
         numAbsences = 0;
     }
 
-    // Copy constructor (deep copy for the stack)
+    // copy constructor (deep copy for the stack)
     Data(const Data& other) {
         this->recordNumber = other.recordNumber;
         this->idNumber = other.idNumber;
@@ -41,11 +41,11 @@ public:
 
         this->numAbsences = other.numAbsences;
 
-        // Deep copy of the absence stack
-        this->absences = other.absences;  // assuming absenceStack supports assignment
+        // deep copy of the absence stack
+        this->absences = other.absences;  
     }
 
-    // Copy assignment operator (deep copy for the stack)
+    // copy assignment operator (deep copy for the stack)
     Data& operator=(const Data& other) {
         if (this != &other) {  // self-assignment check
             this->recordNumber = other.recordNumber;
@@ -58,16 +58,17 @@ public:
 
             this->numAbsences = other.numAbsences;
 
-            // Deep copy of the absence stack
-            this->absences = other.absences;  // assuming absenceStack supports assignment
+            // deep copy of the absence stack
+            this->absences = other.absences;  
         }
         return *this;
     }
 
-    // Destructor (no special cleanup needed as absenceStack will handle it)
+    // destructor (std stack handles dealloc)
     ~Data() {}
 
-    // Setters and getters for each field...
+    // setters and getters for each field...
+
     void setRecordNumber(int num) {
         this->recordNumber = num;
     }
@@ -133,16 +134,16 @@ public:
     }
 
     void setAbsenceDate(const string& absence) {
-        this->absences.pushAbsence(absence);  // Insert absence date on top of stack
+        this->absences.pushAbsence(absence);  // insert absence date on top of stack
     }
 
-    // Getter for the absence stack (returns the stack by reference)
+    // getter for the absence stack (returns the stack by reference)
     const absenceStack<string>& getAbsences(void) const {
         return this->absences;
     }
 
-    // Setter for the absences stack (this assumes absenceStack type is available)
+    // setter for the absences stack
     void setAbsences(const absenceStack<string>& absences) {
-        this->absences = absences;  // Set the stack to a new one
+        this->absences = absences;  
     }
 };

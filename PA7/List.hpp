@@ -6,15 +6,6 @@
 #include <string>
 #include "studentNode.hpp"  // Assuming you have a Data class for student data
 
-// Node structure to hold data and the link to the next node
-template <typename T>
-struct studentNode {
-    T data;
-    studentNode* next;
-
-    studentNode(const T& d) : data(d), next(nullptr) {}
-};
-
 // List class to manage the linked list of students
 template <typename T>
 class List {
@@ -29,7 +20,8 @@ public:
             head = tail = newNode;
         }
         else {
-            tail->next = newNode;
+            
+            tail->setNext(newNode);
             tail = newNode;
         }
         size++;
@@ -45,11 +37,12 @@ public:
         return head;
     }
 
+
     // Destroy the list by deallocating memory
     void destroyList() {
         studentNode<T>* current = head;
         while (current != nullptr) {
-            studentNode<T>* next = current->next;
+            studentNode<T>* next = current->getNext();
             delete current;
             current = next;
         }
@@ -57,12 +50,12 @@ public:
         size = 0;
     }
 
-    // Print the list (useful for debugging)
+    // Print the list (useful for debugging) //FIX ME RAAAH
     void printList() const {
         studentNode<T>* current = head;
         while (current != nullptr) {
-            std::cout << current->data << std::endl;  // Assuming Data class has an overloaded operator<<
-            current = current->next;
+            
+            current = current->getNext();
         }
     }
 

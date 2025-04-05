@@ -1,3 +1,4 @@
+
 #include "Menu.hpp"
 
 void App::runApp() {
@@ -16,6 +17,8 @@ void App::runApp() {
 	int menuChoice = 0;
 
 	bool updatedAttendance = false; //to insure load not called without changed -> can erase data and lead to nullptrs
+	bool customDate = false; //to denote custom date was selected (only used in testing...)
+
 
 	while (menuChoice != 7) { //continue to display menu until user decides to exit
 		cout << "Welcome to the attendance tracker app! " << endl;
@@ -45,23 +48,34 @@ void App::runApp() {
 				lineToList(masterList, line);
 			}
 
-			//cout << "Attendance list successfully inputted!"<<endl; for debuggin
-			masterList.printList(); //for testing, insures list is linked properly
+			//cout << "Attendance list successfully inputted!"<<endl; for debugging
+			//masterList.printList(); //for testing, insures list is linked properly
 
 			system("pause"); //pause to view list/messages before returning to menu
 			system("cls");
 		}break;
 		case 2: {
 
-			if (updatedAttendance == false) break; //don't call if no updates made to attendance
+			if (updatedAttendance == false) {
+				cout << "You haven't made any changes...";
+				system("pause");
+				system("cls");
+				break; //don't call if no updates made to attendance (otherwise it destroys list!)
+
+			}
+				
 
 			//load recent list changes into linked list
-			if (!masterList.isEmpty()) { //insure list object of app is empty, or would write to end
+			if (!masterList.isEmpty()) { //insure list object of app is empty
 				masterList.destroyList();
 			}
 
 			loadMaster(masterData, masterList); //load data into updated list
 			updatedAttendance == false; //reset attendance to false if updated, prevents another load until another update
+			
+			cout << "Updates have been applied";
+			system("pause");
+			system("cls");
 
 		}break;
 		case 3: {
@@ -71,42 +85,62 @@ void App::runApp() {
 				return;
 			}
 			saveMaster(masterDataOutput, masterList); //save all list contents (including absences)
+			system("pause");
+			system("cls");
 
 		}break;
 		case 4: { //mark absences (add to stack)
 
-			system("cls");
 			string date;
-			date = determineDate();
+
+			system("cls");
+			if (customDate == false) { 
+
+				date = determineDate();
+			}
+
+			else if (customDate == true) {//option to add custom date (mostly for debugging)
+				date = determineCustomDate();
+			}
 
 			cout << "Today's date is: " << date;
-			addAbsences(masterList); //checks for empty list, iterates through names to add absence
+			addAbsences(masterList, date); //checks for empty list, iterates through to add absence
 
 			system("pause");
 			system("cls");
 
 			updatedAttendance = true; //allows loading to rewrite old data
+			customDate == false; //insures customDate function is set back to false after being run
 
 		}break;
 		case 5: {
 
 			system("cls");
-			editAbsences(masterList);  // Call Edit Absences function
+			editAbsences(masterList);  // call edit Absences function
 			system("pause");
 			system("cls");
 			break;
 
 		}break;
 		case 6: {
-			generateReportMenu(masterList); // Call the report submenu function
+			generateReportMenu(masterList); // call the report submenu function
 			break;
 
 
 		}break;
 		case 7: {
 			system("cls");
-			//save and close files properly
+			//ifstream and ofstream destructors automatically handle file closing
 			cout << "Byeee...." << endl;
+		}break;
+
+		case 8: { //super secret 8th option,,, allows custom date input (to test adding more dates)
+			system("cls");
+			customDate = true;
+			cout << "Shhh... you found a secret menu option... to manipute time itself..." << endl;
+			cout << "You may now enter a custom date when marking absences..." << endl;
+			system("pause");
+			system("cls");
 		}break;
 		}
 
@@ -116,14 +150,13 @@ void App::runApp() {
 void App::lineToList(List<Data>& masterList, string line) {
 	//parce each line >>convert to student node
 
-	//make a node
 	istringstream iss(line); //storing line as a stream stream type for parsing
 
 	string inputVal; //blank string to store line components
 
 	Data student; //new data to store each line component
 
-	getline(iss, inputVal, ','); //get record num
+	getline(iss, inputVal, ',');
 	student.setRecordNumber(stoi(inputVal));
 
 	getline(iss, inputVal, ',');
@@ -158,13 +191,13 @@ void App::lineToList(List<Data>& masterList, string line) {
 }
 
 void App::loadMaster(ifstream& masterFile, List<Data>& studentList) {
-	string line;  // Variable to hold each line of the file
+	string line;  // variable to hold each line of the file
 
-	// Check if the file is open		
+	// check if the file is open		
 	if (masterFile.is_open()) {
-		cout << "master file opened successfully" << endl << endl; //for debuggin
+		//cout << "master file opened successfully" << endl << endl; //for debugging
 
-		// Loop through the lines in the file
+		// loop through the lines in the file
 		while (getline(masterFile, line)) {
 			lineToListMaster(studentList, line); //load pre-existing list (with absences)
 		}
@@ -177,14 +210,14 @@ void App::loadMaster(ifstream& masterFile, List<Data>& studentList) {
 }
 
 void App::lineToListMaster(List<Data>& masterList, string line) {
-	// Similar to lineToList, adds absence number and stack components
+	// similar to lineToList, adds absence number and stack components
 
-	istringstream iss(line); // Store line as a stream for parsing
-	string inputVal; // Blank string to store line components
+	istringstream iss(line); // store line as a stream for parsing
+	string inputVal; // blank string to store line components
 
-	Data student; // New Data object to store each line component
+	Data student; // new Data object to store each line component
 
-	// Parse record number
+	// parse each component
 	getline(iss, inputVal, ',');
 	student.setRecordNumber(stoi(inputVal));
 
@@ -197,112 +230,109 @@ void App::lineToListMaster(List<Data>& masterList, string line) {
 	getline(iss, lastName, ',');
 
 	inputVal = firstName + ',' + lastName;
-	student.setName(inputVal); // Set full name
+	student.setName(inputVal); 
 
-	// Parse email
 	getline(iss, inputVal, ',');
 	student.setEmail(inputVal);
 
-	// Parse credits, handle audit case
+	// parse credits, handle audit case
 	getline(iss, inputVal, ',');
 	if (inputVal == "AU") {
-		student.setCredits(-1); // Negative value denotes audit
+		student.setCredits(-1); // negative value denotes audit
 	}
 	else {
-		student.setCredits(stoi(inputVal)); // Otherwise, set regular credits
+		student.setCredits(stoi(inputVal));
 	}
 
-	// Parse major
 	getline(iss, inputVal, ',');
 	student.setMajor(inputVal);
 
-	// Parse level
 	getline(iss, inputVal, ',');
 	student.setLevel(inputVal);
 
-	// Parse the number of absences
 	getline(iss, inputVal, ',');
-	student.setNumAbsences(stoi(inputVal)); // Set number of absences
+	student.setNumAbsences(stoi(inputVal)); 
 
-	// Add absence dates to the student's absence stack
+	// ddd absence dates to the student's absence stack
 	for (int i = 0; i < student.getNumAbsences(); ++i) {
 		getline(iss, inputVal, ',');
-		student.setAbsenceDate(inputVal); // Push date onto student's stack
+		student.setAbsenceDate(inputVal); // push date onto student's stack
 	}
 
-	// Insert the student into the master list
-	masterList.insertAtEnd(student); // Insert updated student data into the linked list
+	masterList.insertAtEnd(student); // insert updated student data into the linked list
 }
 
 void App::saveMaster(ofstream& masterFile, List<Data>& updatedStudentList)
 {
-	// Open the output file for writing. If the file is not open, print an error message and return.
+	// open the output file for writing
 	if (!masterFile.is_open()) {
 		cout << "Failed to open the master file for writing." << endl;
 		return;
 	}
 
-	// Get the head of the linked list
+	// get the head of the linked list
 	studentNode<Data>* pTemp = updatedStudentList.getpHead();
-
-	// Iterate through the list and write each student's data to the file
+	
+	// iterate through the list and write each student's data to the file
 	while (pTemp != nullptr) {
-		// Get the student data from the node
+		// get the student data from the node
 		Data student = pTemp->getNodeData();
 
-		// Write the student's basic information: record number, name, email, etc.
-		masterFile << student.getRecordNumber() << ",";  // Record number
-		masterFile << student.getName() << ",";  // Full name
-		masterFile << student.getEmail() << ",";  // Email
-		masterFile << (student.getCredits() == -1 ? "AU" : std::to_string(student.getCredits())) << ",";  // Credits (AU for audit, otherwise regular credits)
-		masterFile << student.getMajor() << ",";  // Major
-		masterFile << student.getLevel() << ",";  // Level (e.g., freshman, sophomore, etc.)
-		masterFile << student.getNumAbsences() << ",";  // Number of absences
+		
+		masterFile << student.getRecordNumber() << ","; 
+		masterFile << student.getName() << ","; 
+		masterFile << student.getEmail() << ",";  
+		masterFile << (student.getCredits() == -1 ? "AU" : std::to_string(student.getCredits())) << ",";  
+		masterFile << student.getMajor() << ",";  
+		masterFile << student.getLevel() << ",";  
+		masterFile << student.getNumAbsences() << ",";  
 
-		// Now, write the absence dates. We assume the absence dates are stored in a stack (which is your custom class absenceStack).
-		absenceStack<string> absences = student.getAbsences();  // Get the absence stack (not std::stack)
+		
+		absenceStack<string> absences = student.getAbsences();  // copy of stack to write dates in correct order
 
-		// Check if the absence stack is empty using the custom isEmpty() method
+		// check if the absence stack is empty 
 		if (!absences.isEmpty()) {
-			// Iterate over the stack and print the dates
+			
 			while (!absences.isEmpty()) {
-				string date = absences.topAbsence();  // Get the top absence date
-				masterFile << date << ",";  // Write each absence date
-				absences.popAbsence();  // Remove the top element after writing it
+				string date = absences.topAbsence();  
+				masterFile << date << ",";  
+				absences.popAbsence();  
 			}
 		}
 
-		// End the line after writing all the data for this student
+		// end the line after writing all the data
 		masterFile << endl;
 
-		// Move to the next student in the list
-		
+		// move to the next student
 		pTemp = pTemp->getNext();
 	}
 
-	// Close the file after writing all data
-	masterFile.close();
-
-	cout << "Master list has been successfully saved!" << endl;
+	cout << "Master list successfully saved!" << endl;
 }
 
 
 string App::determineDate() {
-	// Get the current time
-	time_t currentTime = time(nullptr);  // Get the current time in seconds
-	tm localTime; // tm struct to hold the local time
+	// get the current time
+	time_t currentTime = time(nullptr);  
+	tm localTime; 
+	
+	localtime_s(&localTime, &currentTime);  
 
-	// Convert the time to local time (safe version)
-	localtime_s(&localTime, &currentTime);  // Use localtime_s to safely convert to local time
-
-	// Format the time as a string (e.g., "YYYY-MM-DD")
-	char buffer[11]; // Buffer to store the formatted string
+	// format the time as a string (YYYY-MM-DD)
+	char buffer[11]; // buffer to store the formatted string
 	strftime(buffer, sizeof(buffer), "%Y-%m-%d", &localTime);
 
-	return string(buffer);  // Return the formatted string
+	return string(buffer);  // return the formatted string
 }
 
-void App::addAbsences(List<Data>& masterList) {
+string App::determineCustomDate() {
+	string date;
+	cout << "Enter date in format: YYYY-MM-DD";
+	cin>>date;
+	return date;
+}
+
+void App::addAbsences(List<Data>& masterList, string date) {
 	//iterate through list and prompt to add absence for today's date
 	if (masterList.isEmpty()) {
 		cout << endl; //spacing
@@ -321,36 +351,32 @@ void App::addAbsences(List<Data>& masterList) {
 		cout << "Was " << pTemp->getNodeData().getName() << " present today?" << endl;
 		cin >> absenceIndicator;
 		if (absenceIndicator == 'N' || absenceIndicator == 'n') { //only modify node if prompted
-			//run logic to add to absence stack
-			string date = determineDate();  // Get today's date
-			pTemp->getNodeData().setAbsenceDate(date);  // Push the date onto the stack
-			int currentAbsences = pTemp->getNodeData().getNumAbsences();  // Get the current number of absences
-			pTemp->getNodeData().setNumAbsences(currentAbsences + 1);  // Increment the number of absences
 
-
+			pTemp->getNodeData().setAbsenceDate(date);  // push the date onto the stack
+			int currentAbsences = pTemp->getNodeData().getNumAbsences();
+			pTemp->getNodeData().setNumAbsences(currentAbsences + 1); 
 		}
-
 		system("cls");
-
 		pTemp = pTemp->getNext(); //iterate onto next node
 	}
 	cout << "Attendence data successfully updated, see you tomorrow!" << endl;
 }
-// Function to generate a report for all students showing only the most recent absence.
+
+// function to generate a report for all students showing only the most recent absence.
 void App::generateRecentAbsenceReport(List<Data>& masterList) {
 	if (masterList.isEmpty()) {
 		cout << "No students loaded in the list." << endl;
 		return;
 	}
 
-	cout << "Report for Most Recent Absences:" << endl;
+	cout << "Most Recent Absences:" << endl;
 
-	// Iterate through the list and print the most recent absence for each student.
+	// iterate through the list, print the most recent absence 
 	studentNode<Data>* pTemp = masterList.getpHead();
 
 	while (pTemp != nullptr) {
 		Data student = pTemp->getNodeData();
-		string mostRecentAbsence = "No absences"; // Default message if no absences
+		string mostRecentAbsence = "No absences :)"; // Default message if no absences
 
 		if (!student.getAbsences().isEmpty()) {
 			// Get the most recent absence (peek the top of the stack)
@@ -358,17 +384,19 @@ void App::generateRecentAbsenceReport(List<Data>& masterList) {
 		}
 
 		cout << "Student: " << student.getName() << ", Most Recent Absence: " << mostRecentAbsence << endl;
+
 		pTemp = pTemp->getNext();
+
 	}
 
 	cout << "End of report." << endl;
 }
 
-// Function to generate a report for students with absences that match or exceed a given threshold.
+// function to generate a report for students with absences that match a certain num absences
 void App::generateAbsenceThresholdReport(List<Data>& masterList) {
 	int threshold;
 
-	cout << "Enter the minimum number of absences to filter students: ";
+	cout << "Enter the minimum number of absences: ";
 	cin >> threshold;
 
 	if (masterList.isEmpty()) {
@@ -376,14 +404,14 @@ void App::generateAbsenceThresholdReport(List<Data>& masterList) {
 		return;
 	}
 
-	cout << "Report for Students with Absences >= " << threshold << " :" << endl;
+	cout << "Students with Absences >= " << threshold << " :" << endl;
 
-	// Iterate through the list and print students who have absences >= threshold
+	// iterate through the list and print students who have absences >= threshold
 	studentNode<Data>* pTemp = masterList.getpHead();
 
 	while (pTemp != nullptr) {
 		Data student = pTemp->getNodeData();
-		int numAbsences = student.getNumAbsences(); // Get the number of absences
+		int numAbsences = student.getNumAbsences(); // get the number of absences
 
 		if (numAbsences >= threshold) {
 			cout << "Student: " << student.getName() << ", Number of Absences: " << numAbsences << endl;
@@ -398,7 +426,7 @@ void App::generateAbsenceThresholdReport(List<Data>& masterList) {
 void App::generateReportMenu(List<Data>& masterList) {
 	int reportChoice = 0;
 
-	// Prompt for the type of report the user wants
+	// prompt for the type of report the user wants
 	cout << "Absence Report Menu:" << endl;
 	cout << "Enter 1 to view the most recent absence for all students." << endl;
 	cout << "Enter 2 to generate students with a specific absence count." << endl;
@@ -419,10 +447,10 @@ void App::generateReportMenu(List<Data>& masterList) {
 	}
 }
 
-// Function to search a student by ID or Name
+// function to search a student by ID or Name
 Data* App::searchStudent(List<Data>& masterList) {
 	string searchType;
-	cout << "Search by (ID/Name): ";
+	cout << "Do you want to search by ID or Name? (type your choice): ";
 	cin >> searchType;
 
 	if (searchType == "ID") {
@@ -431,24 +459,25 @@ Data* App::searchStudent(List<Data>& masterList) {
 		cin >> studentId;
 
 		studentNode<Data>* pTemp = masterList.getpHead();
+
 		while (pTemp != nullptr) {
 			if (pTemp->getNodeData().getIdNumber() == studentId) {
-				return &pTemp->getNodeData();  // Return the student's data if found
+				return &pTemp->getNodeData();  // return the student's data if found
 			}
 			pTemp = pTemp->getNext();
 		}
-		cout << "Student not found by ID." << endl;
+		cout << "ID not found :( " << endl;
 	}
 	else if (searchType == "Name") {
 		string studentName;
 		cout << "Enter student Name: ";
-		cin.ignore();  // Ignore newline from previous input
+		cin.ignore();  // ignore newline from previous input
 		getline(cin, studentName);
 
 		studentNode<Data>* pTemp = masterList.getpHead();
 		while (pTemp != nullptr) {
 			if (pTemp->getNodeData().getName() == studentName) {
-				return &pTemp->getNodeData();  // Return the student's data if found
+				return &pTemp->getNodeData();  // return the student's data if found
 			}
 			pTemp = pTemp->getNext();
 		}
@@ -457,48 +486,46 @@ Data* App::searchStudent(List<Data>& masterList) {
 	else {
 		cout << "Invalid search type!" << endl;
 	}
-	return nullptr;  // Return nullptr if no student is found
+	return nullptr;  // return nullptr if no student found
 }
 
 void App::editAbsences(List<Data>& masterList) {
-	Data* student = searchStudent(masterList);  // Get student by ID or Name
+	Data* student = searchStudent(masterList);  // get student by ID or Name
 
 	if (student == nullptr) {
-		cout << "Student not found. Returning to menu." << endl;
+		cout << "Student not found. Back to the menu..." << endl;
 		return;
 	}
 
-	// Print the student's name and absence history
+	// print the student name and absence history
 	cout << "Editing absences for: " << student->getName() << endl;
 	cout << "Current absences: " << endl;
 
 	absenceStack<string> absences = student->getAbsences();
 
-	// Check if there are any absences to display
+	// check if there are any absences to display
 	if (absences.isEmpty()) {
 		cout << "No absences found for this student." << endl;
 	}
 	else {
-		// Show all absence dates
 		while (!absences.isEmpty()) {
-			cout << absences.topAbsence() << endl;  // Display the top absence date
-			absences.popAbsence();  // Remove the top element after displaying it
+			cout << absences.topAbsence() << endl;  // display top absence date
+			absences.popAbsence();  // remove the top element after displaying it
 		}
 	}
 
-	// Ask the user for the absence date to remove
+	// ask the user for the date to remove
 	string dateToRemove;
-	cout << "Enter the absence date to remove (YYYY-MM-DD) or type 'none' to skip: ";
+	cout << "Enter the date to remove (YYYY-MM-DD) or type 'none' to skip: ";
 	cin >> dateToRemove;
 
-	// If the user wants to remove an absence
 	if (dateToRemove != "none") {
-		absenceStack<string> updatedAbsences = student->getAbsences();  // Copy of original absences
+		absenceStack<string> updatedAbsences = student->getAbsences();  // copy of original absences
 		bool found = false;
 
 		while (!updatedAbsences.isEmpty()) {
 			if (updatedAbsences.topAbsence() == dateToRemove) {
-				// Found the absence, so remove it
+				// F=found the absence, so remove it
 				updatedAbsences.popAbsence();
 				found = true;
 				break;
@@ -509,9 +536,9 @@ void App::editAbsences(List<Data>& masterList) {
 		}
 
 		if (found) {
-			student->setAbsences(updatedAbsences);  // Update the student's absence stack
-			int newAbsenceCount = updatedAbsences.size();  // New number of absences
-			student->setNumAbsences(newAbsenceCount);  // Update the total number of absences
+			student->setAbsences(updatedAbsences);  
+			int newAbsenceCount = updatedAbsences.size();  
+			student->setNumAbsences(newAbsenceCount);  // update the total number of absences
 			cout << "Absence on " << dateToRemove << " has been removed!" << endl;
 		}
 		else {
