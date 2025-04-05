@@ -1,13 +1,7 @@
-#ifndef STUDENTNODE_HPP
-#define STUDENTNODE_HPP
+#ifndef STUDENTNODE_H
+#define STUDENTNODE_H
 
-//note for future self: i kept getting constructor errors with the list, after a couple
-//hours i discovered template definitions must be in header :')
-
-//constructor available across files
-//template <typename T>
-//studentNode<T>* newStudentNode(T newData) { return new studentNode<T>(newData); }
-
+#include "studentData.hpp"  // Assuming the Data class is used to store student info
 template <typename T>
 class studentNode {
 private:
@@ -48,4 +42,4 @@ public:
     }
 };
 
-#endif // STUDENTNODE_HPP
+#endif // STUDENTNODE_H

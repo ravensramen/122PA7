@@ -1,149 +1,148 @@
 #include "AbsenceStack.hpp"
-#include <string>
-
-//more like a struct, just has setters and getters
-
 using std::string;
 
+
 class Data {
-
 private:
-	//all student fields
-	int recordNumber;
-	int idNumber;
-	string name;
-	string email;
-	int credits;
-	string major;
-	string level;
+    // all student fields
+    int recordNumber;
+    int idNumber;
+    string name;
+    string email;
+    int credits;
+    string major;
+    string level;
 
-	int numAbsences;
-	absenceStack <string> absences; //declare an instance of stack holding strings (coresponding to dates)
+    int numAbsences;
+    absenceStack<string> absences;  // Stack holding absences
 
 public:
-	//no special definition needed, stacks of STL type handle memory alloc.
-	Data() {
-		recordNumber = 0;
-		idNumber = 0;
-		name = "";
-		email = "";
-		credits = 0;
-		major = "";
-		level = "";
+    // Default constructor
+    Data() {
+        recordNumber = 0;
+        idNumber = 0;
+        name = "";
+        email = "";
+        credits = 0;
+        major = "";
+        level = "";
+        numAbsences = 0;
+    }
 
-		numAbsences = 0;
-	};
+    // Copy constructor (deep copy for the stack)
+    Data(const Data& other) {
+        this->recordNumber = other.recordNumber;
+        this->idNumber = other.idNumber;
+        this->name = other.name;
+        this->email = other.email;
+        this->credits = other.credits;
+        this->major = other.major;
+        this->level = other.level;
 
-	Data(const Data& other) {
-		this->recordNumber = other.recordNumber;
-		this->idNumber = other.idNumber;
-		this->name = other.name;
-		this->email = other.email;
-		this->credits = other.credits;
-		this->major = other.major;
-		this->level = other.level;
+        this->numAbsences = other.numAbsences;
 
-		this->numAbsences = other.numAbsences;
-	}
+        // Deep copy of the absence stack
+        this->absences = other.absences;  // assuming absenceStack supports assignment
+    }
 
+    // Copy assignment operator (deep copy for the stack)
+    Data& operator=(const Data& other) {
+        if (this != &other) {  // self-assignment check
+            this->recordNumber = other.recordNumber;
+            this->idNumber = other.idNumber;
+            this->name = other.name;
+            this->email = other.email;
+            this->credits = other.credits;
+            this->major = other.major;
+            this->level = other.level;
 
+            this->numAbsences = other.numAbsences;
 
-	Data& operator=(const Data& other) { //copy overloaded assignment
-		if (this != &other) { 
-			
-			this->recordNumber = other.recordNumber;
-			this->name = other.name;
-			this->email = other.email;
-			this->credits = other.credits;
-			this->major = other.major;
-			this->level = other.level;
+            // Deep copy of the absence stack
+            this->absences = other.absences;  // assuming absenceStack supports assignment
+        }
+        return *this;
+    }
 
-			this->numAbsences = other.numAbsences;
-		}
+    // Destructor (no special cleanup needed as absenceStack will handle it)
+    ~Data() {}
 
-		return *this;
-	}
+    // Setters and getters for each field...
+    void setRecordNumber(int num) {
+        this->recordNumber = num;
+    }
 
-	~Data() {};
+    int getRecordNumber(void) const {
+        return this->recordNumber;
+    }
 
-	//setters and getters for each field...
-	void setRecordNumber(int num) {
-		this->recordNumber = num;
-	}
+    void setIdNumber(int num) {
+        this->idNumber = num;
+    }
 
-	int getRecordNumber(void) {
-		return this->recordNumber;
-	}
+    int getIdNumber(void) const {
+        return this->idNumber;
+    }
 
-	void setIdNumber(int num) {
-		this->idNumber = num;
-	}
+    void setName(string newName) {
+        this->name = newName;
+    }
 
-	int getIdNumber(void) {
-		return this->idNumber;
-	}
+    string getName(void) const {
+        return this->name;
+    }
 
-	void setName(string newName) {
-		this->name = newName;
-	}
+    void setEmail(string newEmail) {
+        this->email = newEmail;
+    }
 
-	string getName(void) {
-		return this->name;
-	}
+    string getEmail(void) const {
+        return this->email;
+    }
 
-	void setEmail(string newEmail) {
-		this->email = newEmail;
-	}
+    void setCredits(int newCredits) {
+        this->credits = newCredits;
+    }
 
-	string getEmail(void) {
-		return this->email;
-	}
+    int getCredits(void) const {
+        return this->credits;
+    }
 
-	void setCredits(int newCredits) {
-		this->credits = newCredits;
-	}
+    void setMajor(string newMajor) {
+        this->major = newMajor;
+    }
 
-	int getCredits(void) {
-		return this->credits;
-	}
+    string getMajor(void) const {
+        return this->major;
+    }
 
-	void setMajor(string newMajor) {
-		this->major = newMajor;
-	}
+    void setLevel(string newLevel) {
+        this->level = newLevel;
+    }
 
-	string getMajor(void) {
-		return this->major;
-	}
-	
-	void setLevel(string newLevel) {
-		this->level = newLevel;
-	}
+    string getLevel(void) const {
+        return this->level;
+    }
 
-	string getLevel(void) {
-		return this->level;
-	}
+    void setNumAbsences(int num) {
+        this->numAbsences = num;
+    }
 
-	void setNumAbsences(int num) {
-		this->numAbsences = num;
-	}
+    int getNumAbsences(void) const {
+        return this->numAbsences;
+    }
 
-	int getNumAbsences(void) {
-		return this->numAbsences; //could also iterate through stack to determine...
-	}
+    void setAbsenceDate(const string& absence) {
+        this->absences.pushAbsence(absence);  // Insert absence date on top of stack
+    }
 
+    // Getter for the absence stack (returns the stack by reference)
+    const absenceStack<string>& getAbsences(void) const {
+        return this->absences;
+    }
 
-	void setAbsenceDate(string absence) {
-		this->absences.pushAbsence(absence);  // Insert absence date on top of stack
-	}
-
-	// Getter for absences stack
-	absenceStack<string> getAbsences(void) const {
-		return this->absences;  // Return the entire stack of absences
-	}
-
-	// Setter for the absences stack (this assumes the absenceStack type is available)
-	void setAbsences(const absenceStack<string>& absences) {
-		this->absences = absences;  // Set the stack to a new one
-	}
-	
+    // Setter for the absences stack (this assumes absenceStack type is available)
+    void setAbsences(const absenceStack<string>& absences) {
+        this->absences = absences;  // Set the stack to a new one
+    }
 };
